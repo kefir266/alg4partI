@@ -1,0 +1,178 @@
+/**
+ * Created by dmitrij on 24.09.2015.
+ */
+
+import edu.princeton.cs.algs4.StdRandom;
+
+import java.util.NoSuchElementException;
+import java.util.Iterator;
+
+public class RandomizedQueue<Item> implements Iterable<Item> {
+
+    private int N;          // size of the stack
+    private Node first;     // top of stack
+    private Node last;
+
+    // helper linked list class
+    private class Node {
+        private Item item;
+        private Node next;
+        private Node previous;
+
+
+
+        public Node(Node prev) {
+            if (prev != null) prev.previous = this;
+        }
+    }
+
+    public RandomizedQueue() {
+
+        first = null;
+        last = null;
+        N = 0;
+        //assert check();
+    }                 // construct an empty randomized queue
+
+    public boolean isEmpty() {
+        return N == 0;
+
+    }                 // is the queue empty?
+
+    public int size() {
+
+        return N;
+    }                        // return the number of items on the queue
+
+    public void enqueue(Item item) {
+
+        if (item == null) throw new NullPointerException("Null");
+        Node oldfirst = first;
+        first = new Node(oldfirst);
+        first.item = item;
+        first.next = oldfirst;
+        N++;
+        //assert check();
+
+    }          // add the item
+
+    public Item dequeue() {
+        if (isEmpty()) throw new NoSuchElementException("Stack underflow");
+        int rn = 0;
+        if (N > 1)  rn = StdRandom.uniform(0, N);
+        ArrayIterator iterator = new ArrayIterator();
+        Item item = first.item;
+        while (iterator.hasNext() && rn != 0) {
+            item = iterator.next();
+            if (iterator.num == rn) break;
+
+        }
+        if (iterator.current != null) {
+            item = iterator.current.item;
+            Node nx = iterator.current.next;
+            Node px = iterator.current.previous;
+            if (nx != null) nx.previous = px;
+            if (px != null) px.next = nx;
+            iterator.current = null;
+        }
+        else {
+            first = iterator.current.next;
+        }
+
+
+        N--;
+
+        //assert check();
+        return item;
+
+    }                    // remove and return a random item
+
+    public Item sample() {
+
+        if (isEmpty()) throw new NoSuchElementException("Stack underflow");
+        int rn = 0;
+        if (N > 1)  rn = StdRandom.uniform(0, N);
+        ArrayIterator iterator = new ArrayIterator();
+        Item item = first.item;
+        while (iterator.hasNext() && rn != 0) {
+            item = iterator.next();
+            if (iterator.num == rn) break;
+
+        }
+        return item;
+
+    }                     // return (but do not remove) a random item
+
+    public Iterator<Item> iterator() {
+        return new ArrayIterator();
+
+    }        // return an independent iterator over items in random order
+
+
+
+    // check internal invariants
+//    private boolean check() {
+//        if (N == 0) {
+//            if (first != null) return false;
+//        }
+//        else if (N == 1) {
+//            if (first == null)      return false;
+//            if (first.next != null) return false;
+//        }
+//        else {
+//            if (first.next == null) return false;
+//        }
+//
+//        // check internal consistency of instance variable N
+//        int numberOfNodes = 0;
+//        for (Node x = first; x != null; x = x.next) {
+//            numberOfNodes++;
+//        }
+//        if (numberOfNodes != N) return false;
+//
+//        return true;
+//    }
+
+
+    private class ArrayIterator implements Iterator<Item> {
+
+        private Node current = first;
+        private int num = 0;
+
+
+        @Override
+        public boolean hasNext() {
+            return current != null;
+        }
+
+        @Override
+        public Item next() {
+            if (!hasNext()) throw new NoSuchElementException();
+            Item item = current.item;
+            current = current.next;
+            num++;
+
+            return item;
+        }
+
+        @Override
+        public void remove() {
+
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public static void main(String[] args) {
+
+//        RandomizedQueue<Integer> deque = new RandomizedQueue<Integer>();
+//        for (int i = 0; i < 1000; i++){
+//            deque.enqueue(StdRandom.uniform(0, 100));
+//
+//        }
+//
+//        while (!deque.isEmpty()){
+//            System.out.println(deque.dequeue());
+//        }
+//        System.out.println(deque.size());
+    }  // unit testing
+}
